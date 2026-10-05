@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Vista previa · Escena del carrito</title>
+<!--
+  Animática de la escena del carrito (ESC-1). Plan completo en
+  docs/propuestas/escena-carrito-inicio.md.
+
+  Es un boceto de MOVIMIENTO, no de arte: valida tiempos, encuadres y el orden de las
+  tres vistas antes de producir el carrito de verdad. El carrito es de alambre, el
+  pasillo está dibujado de muestra y las ofertas son huecos marcados. Las fases y sus
+  rangos son los mismos de la tabla del plan (§2): si se cambian aquí, se cambian allá.
+
+  Archivo autocontenido a propósito: se abre con doble clic o se manda por mensaje, sin
+  servidor y sin nada de fuera.
+-->
+<style>
+  :root {
+    --crema: #FBF7F0;
+    --marino: #2A3172;
+    --marino-suave: #3D4590;
+    --rojo: #B9262B;
+    --rojo-claro: #EDA3A7;
+    --tinta: #232741;
+    --tinta-suave: #5B5F76;
+    --linea: #E4DDD1;
+    --plata: #98979D;
+    --giro: 0;
+    --letrero: 0;
+    --cima: 0px;
+    --salida: 0;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: auto; }
+  body {
+    margin: 0;
+    background: var(--crema);
+    color: var(--tinta);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    overflow-x: clip; /* nunca hidden: rompería el anclaje */
+  }
+  .serif { font-family: Georgia, "Times New Roman", serif; }
+
+  /* ── lo que ya está encima del héroe: 68 + 54 = 122 px ── */
+  .cabecera {
+    height: 68px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; background: var(--marino); color: var(--crema); font-weight: 600;
+  }
+  .cabecera small { opacity: .7; font-weight: 400; }
+  .barra-hoy {
+    height: 54px; display: flex; align-items: center; padding: 0 16px; gap: 8px;
+    background: var(--crema); border-bottom: 1px solid var(--linea);
+    font-size: 14px; color: var(--tinta-suave);
+  }
+  .barra-hoy b { color: var(--marino); }
+
+  /* ── la escena anclada ── */
+  /* Duración del anclaje (plan §2): 240 vh en escritorio, 180 vh en celular. */
+  .escena { position: relative; height: calc(100svh + 240vh); }
+  @media (max-width: 700px) {
+    .escena { height: calc(100svh + 180vh); }
+  }
+  .escenario {
+    position: sticky; top: 0; height: 100svh;
+    overflow: hidden; /* hidden SOLO dentro del propio sticky, nunca en un ancestro */
+    background: #d9d3c6;
+  }
+  .fondo {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    display: block;
+  }
+  /*
+   * El desenfoque, GRATIS: cada lienzo se dibuja a muy baja resolución y el navegador lo
+   * estira suavizando. Antes era filter: blur() sobre dos lienzos a pantalla completa, y
+   * Safari pinta ese filtro con el procesador, no con la tarjeta gráfica: con uno de ellos
+   * cambiando de opacidad en cada cuadro, era lo que trababa el scroll en iPhone.
+   * Cruzar dos lienzos quietos con opacity sí es barato.
+   */
+  .fondo-medio { opacity: var(--giro); }
+  #carrito, #carrito3d { position: absolute; inset: 0; width: 100%; height: 100%; }
+  /* El 3D llega cuando la página ya se mostró: entra con un fundido corto, no de golpe. */
+  #carrito3d { opacity: 0; transition: opacity 0.35s ease; }
+  #carrito3d.listo { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { #carrito3d { transition: none; } }
+
+  .velo {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      linear-gradient(100deg, rgba(42,49,114,.82) 0%, rgba(42,49,114,.55) 38%, rgba(42,49,114,0) 66%),
+      linear-gradient(to top, rgba(42,49,114,.85) 0%, rgba(42,49,114,0) 34%);
+    opacity: calc(1 - var(--salida));
+  }
+
+  .portada {
+    position: absolute; left: 16px; right: 16px; top: 22px; max-width: 34rem;
+    color: var(--crema);
+    transform: translateY(calc(var(--salida) * -30vh));
+    opacity: calc(1 - var(--salida));
+  }
+  .kicker { margin: 0; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--rojo-claro); font-weight: 600; }
+  .portada h1 { margin: .4rem 0 .6rem; font-size: clamp(2.3rem, 8.5vw, 4.6rem); line-height: .95; font-weight: 600; }
+  .portada h1 em { color: var(--rojo-claro); }
+  .saltar {
+    display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px;
+    border: 2px solid var(--crema); color: var(--crema); text-decoration: none; font-weight: 600;
+    box-shadow: 3px 3px 0 var(--rojo);
+  }
+  .saltar:focus-visible, .directorio a:focus-visible, .hud button:focus-visible { outline: 3px solid var(--crema); outline-offset: 3px; }
+
+  .sello {
+    position: absolute; left: 50%; top: 13%; width: clamp(70px, 14vw, 150px);
+    transform: translate(-50%, calc(var(--salida) * -30vh));
+    opacity: calc(1 - var(--salida));
+    filter: drop-shadow(0 6px 14px rgba(0,0,0,.35));
+  }
+  /* En vertical el titular ocupa el centro de arriba: el sello al centro le caía encima de
+     "hecho victoria." (medido a 375 px). Se va a la derecha del botón de saltar. */
+  @media (max-width: 700px) {
+    .sello { left: auto; right: 16px; top: 158px; width: 64px; transform: translateY(calc(var(--salida) * -30vh)); }
+  }
+  /* En escritorio, al centro le caía encima a "de siempre," (medido a 1100 px): se va a la
+     derecha de la columna del titular, que mide como mucho 34rem. */
+  @media (min-width: 701px) {
+    .sello { left: calc(5vw + 37rem); }
+  }
+
+  /* Al cargar, el escenario empieza 122 px abajo (header + barra Hoy): su fondo queda bajo
+     el pliegue. El directorio se apoya en el borde VISIBLE (--cima), no en el del escenario. */
+  .directorio {
+    position: absolute; left: 0; right: 0; bottom: var(--cima, 0px);
+    display: grid; grid-template-columns: 1fr 1fr;
+    border-top: 1px solid rgba(251,247,240,.25);
+    transform: translateY(calc(var(--salida) * 20vh));
+    opacity: calc(1 - var(--salida));
+  }
+  .directorio a {
+    display: block; min-height: 44px; padding: 10px 14px; color: var(--crema); text-decoration: none;
+    border-left: 1px solid rgba(251,247,240,.18);
+  }
+  .directorio a:first-child { border-left: 0; }
+  .directorio .n { font-size: 11px; color: var(--rojo-claro); font-weight: 700; }
+  .directorio .t { display: block; font-family: Georgia, serif; font-weight: 600; font-size: 16px; line-height: 1.2; }
+  @media (min-width: 900px) {
+    .directorio { grid-template-columns: repeat(4, 1fr); }
+    .portada { left: 5vw; top: 6vh; }
+  }
+
+  /* El letrero colgante del pasillo: el destino tiene nombre antes de llegar. */
+  .letrero {
+    position: absolute; right: 7%; top: 16%;
+    opacity: var(--letrero);
+    transform: translateY(calc((1 - var(--letrero)) * -26px));
+  }
+  .letrero::before, .letrero::after {
+    content: ""; position: absolute; bottom: 100%; width: 2px; height: 40px; background: var(--tinta);
+  }
+  .letrero::before { left: 18%; }
+  .letrero::after { right: 18%; }
+  .letrero span {
+    display: block; padding: 10px 16px; background: var(--marino); color: var(--crema);
+    font: 600 clamp(15px, 2.2vw, 22px) Georgia, serif; border: 2px solid var(--crema);
+    box-shadow: 4px 4px 0 rgba(0,0,0,.25);
+  }
+  .letrero small { display: block; font: 600 11px system-ui, sans-serif; letter-spacing: .16em; color: var(--rojo-claro); }
+
+  .marca-muestra {
+    position: absolute; right: 8px; bottom: 8px; padding: 3px 8px; background: rgba(35,39,65,.75);
+    color: var(--crema); font-size: 11px; opacity: calc(var(--giro) * 1.4);
+  }
+
+  /* ── el destino: sube POR ENCIMA del último cuadro con scroll nativo ── */
+  .ofertas { position: relative; z-index: 2; margin-top: -40svh; }
+  /* Con un anclaje más corto, la misma subida ocupa más fracción: se ajusta para que las
+     tarjetas sigan entrando en la fase destino (p ≈ 0.82). */
+  @media (max-width: 700px) { .ofertas { margin-top: -32svh; } }
+  .ofertas-entrada { padding: 0 16px 28px; }
+  .ofertas-solido { background: var(--crema); padding: 40px 16px 64px; }
+  .tarjetas { display: grid; gap: 14px; grid-template-columns: 1fr; max-width: 72rem; margin: 0 auto; }
+  @media (min-width: 720px) { .tarjetas { grid-template-columns: 1fr 1fr; } }
+  .tarjeta {
+    aspect-ratio: 16 / 9; display: grid; place-items: center; text-align: center; padding: 14px;
+    background: rgba(251,247,240,.96); border: 2px solid var(--marino);
+    box-shadow: 5px 5px 0 rgba(42,49,114,.22);
+  }
+  .tarjeta b { display: block; color: var(--marino); font: 600 20px Georgia, serif; }
+  .tarjeta span { font-size: 13px; color: var(--tinta-suave); }
+  .pendiente { color: var(--rojo); font-weight: 700; font-size: 12px; letter-spacing: .06em; }
+  .ofertas h2 { max-width: 72rem; margin: 0 auto 6px; color: var(--marino); font: 600 30px/1.1 Georgia, serif; }
+  .ig { max-width: 72rem; margin: 22px auto 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .ig div { aspect-ratio: 1; border: 1px solid var(--linea); background: #fff; display: grid; place-items: center; font-size: 11px; color: var(--tinta-suave); text-align: center; padding: 4px; }
+  .sigue { background: #fff; padding: 72px 16px 140px; max-width: 72rem; margin: 0 auto; }
+  .sigue p { color: var(--tinta-suave); }
+
+  /*
+   * Dos modos. PRESENTACIÓN (por omisión): lo que se le enseña al cliente, sin medidor ni
+   * jerga nuestra. TALLER (?taller en la dirección, o la tecla T): el medidor, las medidas
+   * de muestra y las marcas de pendiente, para trabajar los tiempos.
+   */
+  .solo-taller { display: none; }
+  body.taller .solo-taller { display: revert; }
+  body.taller .solo-presentacion { display: none; }
+  body:not(.taller) .hud { display: none; }
+  .soltando .escenario { outline: 4px dashed var(--rojo-claro); outline-offset: -12px; }
+
+  /* ── medidor de la animática (no es parte del diseño) ── */
+  .hud {
+    position: fixed; left: 10px; bottom: 10px; z-index: 10; width: min(300px, calc(100vw - 20px));
+    background: rgba(35,39,65,.92); color: var(--crema); padding: 10px 12px; font-size: 12px;
+    border-radius: 3px;
+  }
+  .hud .fila { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .hud .p { font: 700 20px ui-monospace, Consolas, monospace; }
+  .hud .fase { font-weight: 700; color: var(--rojo-claro); text-transform: uppercase; letter-spacing: .1em; }
+  .hud .riel { position: relative; height: 8px; margin-top: 8px; background: rgba(251,247,240,.15); }
+  .hud .riel i { position: absolute; top: 0; bottom: 0; background: rgba(251,247,240,.22); }
+  .hud .riel b { position: absolute; top: -3px; width: 2px; height: 14px; background: var(--rojo-claro); }
+  .hud button { margin-top: 8px; min-height: 44px; background: transparent; color: var(--crema); border: 1px solid rgba(251,247,240,.4); padding: 0 8px; cursor: pointer; }
+  .hud.oculto .detalle { display: none; }
+
+  /* ── sin movimiento: el MISMO markup, apagado en CSS ── */
+  @media (prefers-reduced-motion: reduce) {
+    .escena { height: auto; }
+    .escenario { position: relative; height: calc(100svh - 122px); min-height: 520px; }
+    .ofertas { margin-top: 0; }
+    .ofertas-entrada { background: var(--crema); padding-top: 28px; }
+  }
+</style>
+<meta name="motor-3d" content="./motor.js" />
+</head>
+<body>
+
+<header class="cabecera">
+  <span>La Victoria <small class="solo-taller">· header de muestra (68 px)</small></span>
+  <span>☰</span>
+</header>
+<div class="barra-hoy"><b>Hoy</b><span class="solo-presentacion">· el horario de tu sucursal</span><span class="solo-taller">· barra de horario de muestra (54 px)</span></div>
+
+<section class="escena" id="escena" data-fase="manubrio" aria-labelledby="titular">
+  <div class="escenario" id="escenario">
+    <canvas class="fondo fondo-muy" aria-hidden="true"></canvas>
+    <canvas class="fondo fondo-medio" aria-hidden="true"></canvas>
+    <div class="velo" aria-hidden="true"></div>
+    <canvas id="carrito" aria-hidden="true"></canvas>
+    <canvas id="carrito3d" aria-hidden="true"></canvas>
+    <img class="sello" src="./sello.png" alt="" aria-hidden="true" />
+
+    <div class="letrero" aria-hidden="true">
+      <span><small>Pasillo 1</small>Ofertas de la semana ›</span>
+    </div>
+
+    <div class="portada">
+      <p class="kicker">Desde 1994 · Baja California Sur</p>
+      <h1 id="titular" class="serif">El mandado<br />de siempre,<br /><em>hecho victoria.</em></h1>
+      <a class="saltar" href="#ofertas">Saltar a las ofertas ↓</a>
+    </div>
+
+    <nav class="directorio" aria-label="Accesos directos">
+      <a href="#"><span class="n">01</span><span class="t">Sucursales y horarios</span></a>
+      <a href="#"><span class="n">02</span><span class="t">Productos</span></a>
+      <a href="#"><span class="n">03</span><span class="t">Contacto</span></a>
+      <a href="#"><span class="n">04</span><span class="t">Nosotros</span></a>
+    </nav>
+
+    <p class="marca-muestra" id="marca-muestra" aria-hidden="true">Vista previa · el pasillo y los productos finales serán de su tienda</p>
+  </div>
+</section>
+
+<section class="ofertas" id="ofertas" aria-labelledby="ofertas-titulo">
+  <div class="ofertas-entrada">
+    <div class="tarjetas">
+      <div class="tarjeta"><div><b>Su promoción de la semana</b><span>Aquí va el banner, con su vigencia</span><br /><span class="pendiente solo-taller">PENDIENTE-CLIENTE · PROMO-1</span></div></div>
+      <div class="tarjeta"><div><b>Segunda promoción</b><span>Una versión para celular y otra para computadora</span><br /><span class="pendiente solo-taller">PENDIENTE-CLIENTE · PROMO-1</span></div></div>
+    </div>
+  </div>
+  <div class="ofertas-solido">
+    <h2 id="ofertas-titulo">Ofertas de la semana</h2>
+    <p style="max-width:72rem;margin:0 auto;color:var(--tinta-suave)">El pasillo al que llega el carrito. Aquí siguen el resto de banners vigentes y lo nuevo de Instagram.</p>
+    <div class="ig">
+      <div>Lo nuevo de su Instagram<br /><span class="pendiente solo-taller">IG-1</span></div>
+      <div>Lo nuevo de su Instagram<br /><span class="pendiente solo-taller">IG-1</span></div>
+      <div>Lo nuevo de su Instagram<br /><span class="pendiente solo-taller">IG-1</span></div>
+      <div>Lo nuevo de su Instagram<br /><span class="pendiente solo-taller">IG-1</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="sigue">
+  <h2 class="serif" style="color:var(--marino)">Y sigue el inicio de siempre</h2>
+  <p>La historia, las cifras de la casa y el recorrido por los pasillos.<span class="solo-taller"> (E3 · El anclaje ya se soltó: desde aquí el scroll es normal.)</span></p>
+</section>
+
+<aside class="hud" id="hud" aria-label="Medidor de la animática">
+  <div class="fila"><span class="p" id="hud-p">0.00</span><span class="fase" id="hud-fase">manubrio</span></div>
+  <div id="hud-cae" style="min-height:1.2em;color:var(--crema)"></div>
+  <div class="detalle">
+    <div class="riel" id="hud-riel"><b id="hud-marca" style="left:0"></b></div>
+    <div style="margin-top:6px;opacity:.75">Avance de la escena (0–1) y su fase, los mismos del plan §2. Se escribe así para pedir cambios: "en 0.45 que el letrero ya esté".</div>
+  </div>
+  <button type="button" id="hud-boton">Ocultar medidor</button>
+  <label style="display:inline-flex;align-items:center;min-height:44px;margin-left:6px;padding:0 8px;border:1px solid rgba(251,247,240,.4);cursor:pointer">
+    Usar foto de pasillo…<input type="file" id="foto-pasillo" accept="image/*" style="position:absolute;width:1px;height:1px;opacity:0" />
+  </label>
+  <div style="margin-top:6px;opacity:.75">O arrastra la imagen encima de la escena. Se queda solo en este navegador: no se sube a ningún lado.</div>
+</aside>
+
+
+<script src="./escena.js"></script>
+<script src="./medidor.js"></script>
+</body>
+</html>

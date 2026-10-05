@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Control del medidor</title>
+<!--
+  Página de CONTROL: sin escena, sin 3D, sin nada que pintar más que bloques de color.
+  Sirve para saber cuántos cuadros por segundo da el teléfono por sí solo. Si aquí
+  también salen ~30, el límite es del teléfono (por ejemplo, el Modo de bajo consumo del
+  iPhone), no de la escena.
+-->
+<style>
+  body { margin: 0; font: 18px/1.5 system-ui, sans-serif; color: #232741; }
+  section { height: 100svh; display: grid; place-items: center; text-align: center; padding: 16px; }
+  section:nth-child(odd) { background: #FBF7F0; }
+  section:nth-child(even) { background: #E4DDD1; }
+</style>
+</head>
+<body>
+  <section><p><b>Página de control</b><br />Baja con el dedo de arriba a abajo.</p></section>
+  <section><p>Aquí no hay nada que pese.</p></section>
+  <section><p>Lo que marque el medidor es lo que da el teléfono solo.</p></section>
+  <section><p>Fin.</p></section>
+  <script src="./medidor.js"></script>
+</body>
+</html>
