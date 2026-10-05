@@ -181,17 +181,105 @@
   .tarjetas { display: grid; gap: 14px; grid-template-columns: 1fr; max-width: 72rem; margin: 0 auto; }
   /* En PC, dos banners de 72rem tapaban media pantalla: se topan en un ancho de banner. */
   @media (min-width: 720px) { .tarjetas { grid-template-columns: 1fr 1fr; max-width: 54rem; } }
+  /*
+   * Banners de EJEMPLO (05-oct-2026): para ver el destino lleno. Precios y vigencias son
+   * inventados y lo dicen a la vista; los reales llegan con PROMO-1.
+   */
   .tarjeta {
-    aspect-ratio: 16 / 9; display: grid; place-items: center; text-align: center; padding: 14px;
-    background: rgba(251,247,240,.96); border: 2px solid var(--marino);
+    position: relative; overflow: hidden; aspect-ratio: 16 / 9;
+    display: grid; grid-template-columns: 1.25fr 1fr; align-items: center; gap: 6px;
+    container-type: inline-size; /* lo de adentro se mide contra el banner, no la ventana */
+    padding: 5.5cqi; color: var(--crema); background: var(--marino);
     box-shadow: 5px 5px 0 rgba(42,49,114,.22);
   }
-  .tarjeta b { display: block; color: var(--marino); font: 600 20px Georgia, serif; }
-  .tarjeta span { font-size: 13px; color: var(--tinta-suave); }
+  .tarjeta.roja { background: var(--rojo); box-shadow: 5px 5px 0 rgba(185,38,43,.22); }
+  .tarjeta .k { margin: 0; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; opacity: .8; }
+  .tarjeta h3 { margin: 4px 0 10px; font: 600 clamp(18px, 6.4cqi, 28px)/1.04 Georgia, serif; }
+  .tarjeta .vig { display: block; margin-top: 8px; font-size: 11px; opacity: .75; }
+  .tarjeta .arte { font-size: 13.5cqi; line-height: 1.1; text-align: center; }
+  .tarjeta .arte i { white-space: nowrap; }
+  .tarjeta .arte i { display: block; font-style: normal; }
+  .etiqueta {
+    display: inline-flex; align-items: baseline; gap: 4px; padding: 5px 10px 4px;
+    background: var(--crema); color: var(--rojo); font-weight: 800; line-height: 1;
+    font-size: clamp(18px, 7cqi, 30px); box-shadow: 3px 3px 0 rgba(0,0,0,.18);
+  }
+  .tarjeta.roja .etiqueta { color: var(--marino); }
+  .etiqueta small { font-size: .42em; font-weight: 700; color: var(--tinta-suave); }
+  .ejemplo {
+    position: absolute; top: 0; right: 0; padding: 3px 8px; background: rgba(251,247,240,.92);
+    color: var(--rojo); font-size: 10px; font-weight: 800; letter-spacing: .14em;
+  }
+
+  /* La rejilla de ofertas: producto, precio antes y ahora. */
+  .aviso-ejemplo {
+    max-width: 72rem; margin: 10px auto 0; padding: 8px 12px; border-left: 3px solid var(--rojo);
+    background: #fff; font-size: 13px; color: var(--tinta-suave);
+  }
+  .rejilla {
+    max-width: 72rem; margin: 22px auto 0; padding: 0; list-style: none;
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+  }
+  @media (min-width: 720px) { .rejilla { grid-template-columns: repeat(4, 1fr); gap: 14px; } }
+  .rejilla li {
+    position: relative; display: flex; flex-direction: column; padding: 12px;
+    background: #fff; border: 1px solid var(--linea);
+  }
+  .rejilla .foto {
+    display: grid; place-items: center; aspect-ratio: 4 / 3; margin-bottom: 10px;
+    font-size: 52px; background: var(--crema);
+  }
+  .rejilla .menos {
+    position: absolute; top: 12px; left: 12px; padding: 2px 6px; background: var(--rojo);
+    color: #fff; font-size: 12px; font-weight: 800;
+  }
+  .rejilla h3 { margin: 0; font-size: 14px; font-weight: 600; line-height: 1.25; color: var(--tinta); }
+  .rejilla .unidad { font-size: 12px; color: var(--tinta-suave); }
+  .rejilla .precios { margin-top: auto; padding-top: 8px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .rejilla .ahora { color: var(--rojo); font-size: 22px; font-weight: 800; line-height: 1; }
+  .rejilla s { color: var(--tinta-suave); font-size: 13px; }
+
+  /* Instagram de EJEMPLO: así se vería el feed (IG-1) con publicaciones de la casa. */
+  .ig-cabeza {
+    max-width: 72rem; margin: 52px auto 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+  .ig-avatar {
+    flex: none; width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--marino); color: var(--crema); font: 700 18px Georgia, serif;
+    box-shadow: 0 0 0 2px var(--crema), 0 0 0 4px var(--rojo);
+  }
+  .ig-cabeza h2 { margin: 0; }
+  .ig-cabeza p { margin: 0; font-size: 14px; color: var(--tinta-suave); }
+  .ig-seguir {
+    margin-left: auto; min-height: 44px; display: inline-flex; align-items: center; padding: 0 18px;
+    background: var(--marino); color: var(--crema); font-weight: 700; font-size: 14px; text-decoration: none;
+  }
+  .ig-seguir:focus-visible { outline: 3px solid var(--rojo); outline-offset: 3px; }
+  @media (max-width: 520px) { .ig-seguir { margin-left: 0; width: 100%; justify-content: center; } }
   .pendiente { color: var(--rojo); font-weight: 700; font-size: 12px; letter-spacing: .06em; }
   .ofertas h2 { max-width: 72rem; margin: 0 auto 6px; color: var(--marino); font: 600 30px/1.1 Georgia, serif; }
-  .ig { max-width: 72rem; margin: 22px auto 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-  .ig div { aspect-ratio: 1; border: 1px solid var(--linea); background: #fff; display: grid; place-items: center; font-size: 11px; color: var(--tinta-suave); text-align: center; padding: 4px; }
+  .ig { max-width: 72rem; margin: 18px auto 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  @media (min-width: 720px) { .ig { grid-template-columns: repeat(6, 1fr); gap: 10px; } }
+  .ig li {
+    position: relative; aspect-ratio: 1; overflow: hidden; display: grid; place-items: center;
+    color: #fff; text-align: center; container-type: inline-size;
+  }
+  .ig .emo { font-size: 34cqi; line-height: 1; }
+  .ig .pie {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 8px 7px;
+    background: linear-gradient(transparent, rgba(0,0,0,.55));
+    font: 600 clamp(10px, 8.6cqi, 15px)/1.15 Georgia, serif;
+  }
+  .ig .likes {
+    position: absolute; top: 6px; right: 7px; font-size: clamp(9px, 7.5cqi, 12px); font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0,0,0,.4);
+  }
+  .ig .p1 { background: linear-gradient(135deg, #2A3172, #4C56B0); }
+  .ig .p2 { background: linear-gradient(135deg, #B9262B, #E0585C); }
+  .ig .p3 { background: linear-gradient(135deg, #3E7D3A, #86B85B); }
+  .ig .p4 { background: linear-gradient(135deg, #C77A1E, #F0B44C); }
+  .ig .p5 { background: linear-gradient(135deg, #1F6D8C, #49A9C9); }
+  .ig .p6 { background: linear-gradient(135deg, #6B2F6E, #B0569B); }
   .sigue { background: #fff; padding: 72px 16px 140px; max-width: 72rem; margin: 0 auto; }
   .sigue p { color: var(--tinta-suave); }
 
@@ -272,19 +360,59 @@
 <section class="ofertas" id="ofertas" aria-labelledby="ofertas-titulo">
   <div class="ofertas-entrada">
     <div class="tarjetas">
-      <div class="tarjeta"><div><b>Su promoción de la semana</b><span>Aquí va el banner, con su vigencia</span><br /><span class="pendiente solo-taller">PENDIENTE-CLIENTE · PROMO-1</span></div></div>
-      <div class="tarjeta"><div><b>Segunda promoción</b><span>Una versión para celular y otra para computadora</span><br /><span class="pendiente solo-taller">PENDIENTE-CLIENTE · PROMO-1</span></div></div>
+      <article class="tarjeta">
+        <span class="ejemplo">EJEMPLO</span>
+        <div>
+          <p class="k">Frutas y verduras</p>
+          <h3>Lo fresco de la semana</h3>
+          <span class="etiqueta">$39.90 <small>/ kg aguacate</small></span>
+          <span class="vig">Vigencia de ejemplo: del 6 al 12 de octubre</span>
+        </div>
+        <div class="arte" aria-hidden="true"><i>🥑🍅</i><i>🍌🥕</i></div>
+      </article>
+      <article class="tarjeta roja">
+        <span class="ejemplo">EJEMPLO</span>
+        <div>
+          <p class="k">Ferretería</p>
+          <h3>Todo para arreglar la casa</h3>
+          <span class="etiqueta">-20% <small>en herramienta</small></span>
+          <span class="vig">Vigencia de ejemplo: todo octubre</span>
+        </div>
+        <div class="arte" aria-hidden="true"><i>🔨🪛</i><i>🪣🔧</i></div>
+      </article>
     </div>
   </div>
   <div class="ofertas-solido">
     <h2 id="ofertas-titulo">Ofertas de la semana</h2>
-    <p style="max-width:72rem;margin:0 auto;color:var(--tinta-suave)">El pasillo al que llega el carrito. Aquí siguen el resto de banners vigentes y lo nuevo de Instagram.</p>
-    <div class="ig">
-      <div>Lo nuevo de su Instagram<br /><span class="pendiente solo-taller">IG-1</span></div>
-      <div>Lo nuevo de su Instagram<br /><span class="pendiente solo-taller">IG-1</span></div>
-      <div>Lo nuevo de su Instagram<br /><span class="pendiente solo-taller">IG-1</span></div>
-      <div>Lo nuevo de su Instagram<br /><span class="pendiente solo-taller">IG-1</span></div>
+    <p style="max-width:72rem;margin:0 auto;color:var(--tinta-suave)">El pasillo al que llega el carrito.</p>
+    <p class="aviso-ejemplo"><strong>Contenido de ejemplo.</strong> Productos, precios y publicaciones son inventados para enseñar el diseño: no son ofertas reales.<span class="pendiente solo-taller"> · PENDIENTE-CLIENTE · PROMO-1 / IG-1</span></p>
+    <ul class="rejilla">
+      <li><span class="menos">-25%</span><div class="foto" aria-hidden="true">🥛</div><h3>Leche entera</h3><span class="unidad">1 litro</span><div class="precios"><span class="ahora">$21.90</span><s>$28.90</s></div></li>
+      <li><span class="menos">-15%</span><div class="foto" aria-hidden="true">🍗</div><h3>Pierna y muslo de pollo</h3><span class="unidad">por kilo</span><div class="precios"><span class="ahora">$64.90</span><s>$76.50</s></div></li>
+      <li><span class="menos">2×1</span><div class="foto" aria-hidden="true">🍞</div><h3>Pan de caja blanco</h3><span class="unidad">680 g</span><div class="precios"><span class="ahora">$45.00</span><s>$90.00</s></div></li>
+      <li><span class="menos">-30%</span><div class="foto" aria-hidden="true">🍉</div><h3>Sandía</h3><span class="unidad">por kilo</span><div class="precios"><span class="ahora">$12.90</span><s>$18.50</s></div></li>
+      <li><span class="menos">-10%</span><div class="foto" aria-hidden="true">☕</div><h3>Café molido</h3><span class="unidad">400 g</span><div class="precios"><span class="ahora">$98.00</span><s>$109.00</s></div></li>
+      <li><span class="menos">-20%</span><div class="foto" aria-hidden="true">🧴</div><h3>Detergente líquido</h3><span class="unidad">3 litros</span><div class="precios"><span class="ahora">$119.00</span><s>$149.00</s></div></li>
+      <li><span class="menos">-15%</span><div class="foto" aria-hidden="true">💡</div><h3>Foco LED 9 W</h3><span class="unidad">pieza</span><div class="precios"><span class="ahora">$33.90</span><s>$39.90</s></div></li>
+      <li><span class="menos">-20%</span><div class="foto" aria-hidden="true">🎨</div><h3>Pintura vinílica blanca</h3><span class="unidad">4 litros</span><div class="precios"><span class="ahora">$359.00</span><s>$449.00</s></div></li>
+    </ul>
+
+    <div class="ig-cabeza">
+      <span class="ig-avatar" aria-hidden="true">LV</span>
+      <div>
+        <h2 class="serif" style="color:var(--marino);font-size:24px">Lo nuevo en Instagram</h2>
+        <p>@almacen_lavictoria · publicaciones de ejemplo</p>
+      </div>
+      <a class="ig-seguir" href="https://www.instagram.com/almacen_lavictoria/" target="_blank" rel="noopener">Seguir en Instagram</a>
     </div>
+    <ul class="ig" aria-label="Publicaciones de ejemplo">
+      <li class="p1"><span class="likes">♥ 248</span><span class="emo" aria-hidden="true">🛒</span><span class="pie">#LaVictoriaLoTiene</span></li>
+      <li class="p2"><span class="likes">♥ 312</span><span class="emo" aria-hidden="true">🌶️</span><span class="pie">Todo para tu salsa</span></li>
+      <li class="p3"><span class="likes">♥ 187</span><span class="emo" aria-hidden="true">🥑</span><span class="pie">Receta: guacamole</span></li>
+      <li class="p4"><span class="likes">♥ 421</span><span class="emo" aria-hidden="true">🥖</span><span class="pie">Pan recién horneado</span></li>
+      <li class="p5"><span class="likes">♥ 156</span><span class="emo" aria-hidden="true">🐟</span><span class="pie">Del mar a tu mesa</span></li>
+      <li class="p6"><span class="likes">♥ 274</span><span class="emo" aria-hidden="true">🎉</span><span class="pie">Desde 1994 contigo</span></li>
+    </ul>
   </div>
 </section>
 
