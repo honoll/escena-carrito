@@ -174,7 +174,9 @@
         }
       : {
           fov: 45,
-          cam0: [0, 1.42, -1.05], mira0: [0, 0.45, 0.90], // manubrio al ~66 %: arriba del directorio
+          // Manubrio al ~66 % del alto (arriba del directorio) y a ~60 % del ancho: más cerca,
+          // en 16:9 cruzaba casi toda la pantalla y le apretaba el titular (visto a 1366 px).
+          cam0: [0, 1.42, -1.18], mira0: [0, 0.62, 0.90],
           cam1: [0, 0.88, -2.90], mira1: [0, 0.52, 0.00],
           pos2: [1.35, 0, 3.4], giro2: 60,
         };
@@ -281,7 +283,11 @@
    * 14 px del desenfoque fuerte de antes, 1 ≈ los 4 px del suave.
    */
   const ESCALA_FONDO = 4;
-  const RADIOS = [3, 1]; // muy desenfocado, medio desenfocado
+  const RADIOS = [3, 1]; // muy desenfocado, medio desenfocado — en un celular de 390 px
+  // …y crecen con la pantalla. Fijos en píxeles, en una PC de 1366 px casi no desenfocaban
+  // y el pasillo de muestra se veía tal cual, con sus bloques toscos: en el iPhone se veía
+  // bien y en la PC mal (Alejandro, 05-oct-2026). El desenfoque es proporción, no píxeles.
+  const ANCHO_DE_REFERENCIA = 390;
   /*
    * La resolución del 3D arranca en la de la pantalla (topada en 1.5 en celular y 2 en
    * escritorio) y BAJA sola si el
@@ -315,7 +321,7 @@
       const g = destino.getContext('2d');
       g.imageSmoothingQuality = 'high';
       g.drawImage(base, 0, 0, destino.width, destino.height);
-      desenfocar(destino, RADIOS[i]);
+      desenfocar(destino, Math.max(RADIOS[i], Math.round((RADIOS[i] * W) / ANCHO_DE_REFERENCIA)));
     });
   }
 
@@ -571,16 +577,37 @@
     }
   }
 
+  /*
+   * Con mouse, la escena ALCANZA al scroll en ~0.1 s en vez de ir pegada a él.
+   * Cada muesca de la rueda brinca ~100 px; en una escena de ~1,800 px de recorrido eso es
+   * un 5 % por clic, y el carrito avanzaba a saltos. El scroll no se toca —el visitante
+   * sigue mandando—: solo el dibujo se pone al día con suavidad.
+   * En pantallas táctiles el dedo ya desplaza suave y la escena sigue pegada al scroll,
+   * como estaba: en el iPhone se veía bien y no se le cambia nada.
+   */
+  const conMouse = matchMedia('(pointer: fine)');
+  const ALCANCE_MS = 110;
+  let pMostrado = null, tAnterior = 0;
+
   function cuadro(t = performance.now()) {
     pendiente = false;
     vigilarRitmo(t);
     // Primero TODAS las lecturas; luego las escrituras.
     const r = escena.getBoundingClientRect();
-    const p = quieto.matches ? 0 : avance(r);
+    const objetivo = quieto.matches ? 0 : avance(r);
+    let p = objetivo;
+    if (conMouse.matches && pMostrado !== null) {
+      const dt = Math.min(64, t - tAnterior || 16);
+      p = pMostrado + (objetivo - pMostrado) * (1 - Math.exp(-dt / ALCANCE_MS));
+      if (Math.abs(objetivo - p) < 0.0005) p = objetivo;
+    }
+    pMostrado = p;
+    tAnterior = t;
     const fase = FASES.find((f) => p <= f.hasta) || FASES[FASES.length - 1];
     if (escena.dataset.fase !== fase.nombre) escena.dataset.fase = fase.nombre;
     pintar(p, Math.max(0, r.top));
     if (taller) { hudP.textContent = p.toFixed(2); hudF.textContent = fase.nombre; hudM.style.left = p * 100 + '%'; }
+    if (p !== objetivo) pedir(); // sigue alcanzando aunque el scroll ya se haya detenido
   }
   const pedir = () => { if (!pendiente) { pendiente = true; requestAnimationFrame(cuadro); } };
 

@@ -179,7 +179,8 @@
   .ofertas-entrada { padding: 0 16px 28px; }
   .ofertas-solido { background: var(--crema); padding: 40px 16px 64px; }
   .tarjetas { display: grid; gap: 14px; grid-template-columns: 1fr; max-width: 72rem; margin: 0 auto; }
-  @media (min-width: 720px) { .tarjetas { grid-template-columns: 1fr 1fr; } }
+  /* En PC, dos banners de 72rem tapaban media pantalla: se topan en un ancho de banner. */
+  @media (min-width: 720px) { .tarjetas { grid-template-columns: 1fr 1fr; max-width: 54rem; } }
   .tarjeta {
     aspect-ratio: 16 / 9; display: grid; place-items: center; text-align: center; padding: 14px;
     background: rgba(251,247,240,.96); border: 2px solid var(--marino);
