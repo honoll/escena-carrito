@@ -244,10 +244,10 @@
     max-width: 72rem; margin: 52px auto 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
   }
   .ig-avatar {
-    flex: none; width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center;
-    background: var(--marino); color: var(--crema); font: 700 18px Georgia, serif;
+    flex: none; width: 52px; height: 52px; border-radius: 50%; object-fit: cover; background: #fff;
     box-shadow: 0 0 0 2px var(--crema), 0 0 0 4px var(--rojo);
   }
+  .ig-cabeza > div { flex: 1 1 12rem; min-width: 0; } /* el título se dobla junto a la foto, no debajo */
   .ig-cabeza h2 { margin: 0; }
   .ig-cabeza p { margin: 0; font-size: 14px; color: var(--tinta-suave); }
   .ig-seguir {
@@ -389,7 +389,7 @@
     </ul>
 
     <div class="ig-cabeza">
-      <span class="ig-avatar" aria-hidden="true">LV</span>
+      <img class="ig-avatar" src="ig/perfil.webp" alt="" width="52" height="52" loading="lazy" decoding="async" />
       <div>
         <h2 class="serif" style="color:var(--marino);font-size:24px">Lo nuevo en Instagram</h2>
         <p>@lavictoriasupermercados</p>
