@@ -19,12 +19,17 @@
 
   const ultimos = [];
   let anterior = 0, total = 0, lentos = 0, moviendo = 0, corriendo = false;
+  // La gama y la resolución que eligió la escena (las deja en <html data-gama data-resolucion>).
+  const gama = () => {
+    const d = document.documentElement.dataset;
+    return d.gama ? `\ngama ${d.gama}${d.resolucion ? ' · ' + d.resolucion + '×' : ''}` : '';
+  };
   const mostrar = () => {
-    if (!ultimos.length) { caja.textContent = 'Baja con el dedo…'; return; }
+    if (!ultimos.length) { caja.textContent = 'Baja con el dedo…' + gama(); return; }
     const promedio = ultimos.reduce((a, b) => a + b, 0) / ultimos.length;
     caja.textContent = `${Math.round(1000 / promedio)} cuadros/seg\n`
       + `${Math.round((100 * lentos) / Math.max(1, total))} % cuadros lentos\n`
-      + `${total} cuadros medidos`;
+      + `${total} cuadros medidos` + gama();
   };
   const cuadro = (t) => {
     if (anterior) {
